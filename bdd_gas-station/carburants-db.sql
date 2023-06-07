@@ -66,7 +66,7 @@ CREATE TABLE `price`(
     selling_point_id INTEGER,
     gas_name TEXT,
     value FLOAT,
-    date TEXT DEFAULT CURRENT_TIMESTAMP,
+    date TEXT,
     FOREIGN KEY (selling_point_id) REFERENCES selling_point(id),
     FOREIGN KEY (gas_name) REFERENCES gas(name)
 );
@@ -76,8 +76,8 @@ CREATE TABLE `out_of`(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     selling_point_id INTEGER,
     gas_name TEXT,
-    start TEXT DEFAULT CURRENT_TIMESTAMP,
-    end TEXT DEFAULT CURRENT_TIMESTAMP,
+    start TEXT,
+    end TEXT,
     FOREIGN KEY (selling_point_id) REFERENCES selling_point(id),
     FOREIGN KEY (gas_name) REFERENCES gas(name)
 );
@@ -159,4 +159,32 @@ VALUES
 
 INSERT INTO price (selling_point_id, gas_name, value, date)
 VALUES
-    ();
+    (1, 'SP98', 1.986, datetime('now')),
+    (1, 'SP95', 1.875, datetime('now')),
+    (1, 'Gasole', 1.684, datetime('now')),
+    (2, 'SP98', 1.986, datetime('now')),
+    (2, 'SP95', 1.875, datetime('now')),
+    (2, 'Gasole', 1.684, datetime('now')),
+    (3, 'SP98', 1.986, datetime('now')),
+    (3, 'SP95', 1.875, datetime('now')),
+    (3, 'Gasole', 1.684, datetime('now'));
+-- SELECT * FROM price;
+
+INSERT INTO out_of (selling_point_id, gas_name, start, end)
+VALUES
+    (1, 'SP95', datetime('now'), datetime('now', '+10 day')),
+    (3, 'SP98', datetime('now'), datetime('now' , '+1 day'));
+--SELECT * FROM out_of;
+
+-- @block
+-- selectionner tous les éléments de selling_point, On joint les jours de fermeture avec pour relation l'id
+-- concrètement : on cherche les informations sur les points de vente, et on souhaite savoir s'il sont ouverts ou fermés
+SELECT * FROM selling_point
+JOIN main.closing AS c -- utilisation de l'ALIAS c pour la table closing
+ON selling_point.id = c.selling_point_id;
+
+-- selectionner tous les éléments de selling_point, On joint les carburants en rupture avec pour relation l'id
+-- concrètement : on cherche toutes les informations sur les points de vente qui sont en rupture de caburant (indiqué dans la table out_of)
+SELECT * FROM selling_point
+JOIN out_of AS oo -- on utilise oo comme ALIAS pour out_of
+ON selling_point.id = oo.selling_point_id
